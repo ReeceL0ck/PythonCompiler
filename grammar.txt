@@ -1,0 +1,14 @@
+program ::= {statement}
+statement ::= "PRINT" (expression | string) nl
+    |   "LET" indent "=" expression nl
+    |   "IF" condition "THEN" nl {statement} "ENDIF" nl
+    |   "WHILE" condition "REPEAT" nl {statement} "ENDWHILE" nl
+    |   "LABEL" indent nl
+    |   "GOTO" ident nl
+    |   "INPUT" indent n
+condition ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
+expression ::= term {("-" | "+") term}
+term ::= unary {("/" | "*") unary}
+unary ::= ["+" | "-"] primary
+primary ::= number | indent
+nl ::= '\n'+
