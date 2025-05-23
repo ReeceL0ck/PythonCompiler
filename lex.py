@@ -32,7 +32,7 @@ class TokenType(enum.Enum):
     ENDIF = 108
     WHILE = 109
     REPEAT = 110
-    ENDWHILE = 11
+    ENDWHILE = 111
 
     #OPERATORS
     EQ = 201
@@ -148,7 +148,7 @@ class Lexer:
 
                 if not self.peek().isdigit():
                     self.abort("Illegal Character fond in number: " + self.currentChar)        
-            tokText = self.source[startPos: self.currentPos]
+            tokText = self.source[startPos: self.currentPos+1]
             token = Token(tokText, TokenType.NUMBER)
         elif self.currentChar.isalpha():
             startPos = self.currentPos

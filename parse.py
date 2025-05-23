@@ -5,10 +5,14 @@ class Parser():
     def __init__(self,lexer):
         self.lexer = lexer
 
+        self.symbols = set()
+        self.labelsDeclared = set()
+        self.labelsGotoed = set()
+
         self.currentToken = None
         self.peekToken = None
         self.nextToken()
-        self.nextToken()
+        self.nextToken() # Get the first two tokens for the peek
 
     def checkToken(self,kind):
         return kind == self.currentToken.kind
@@ -33,6 +37,11 @@ class Parser():
 
         while not self.checkToken(TokenType.EOF):
             self.statement()
+        
+        for  label in self.labelsGotoed:
+            if label not in self.labelsDeclared:
+                self.abort("Label " + label + " not declared")
+        print("PROGRAM END")
     # Checks all the grammar statements
     def statement(self):
 
@@ -59,24 +68,37 @@ class Parser():
             print("STATEMENT_WHILE")
             self.nextToken()
             self.condition()
+
             self.match(TokenType.REPEAT)
             self.nl()
+            
             while not self.checkToken(TokenType.ENDWHILE):
                 self.statement()
-        
+
+            self.match(TokenType.ENDWHILE)
+            
         elif self.checkToken(TokenType.LABEL):
             print("STATEMENT_LABEL")
             self.nextToken()
+            
+            if self.currentToken.text in self.labelsDeclared:
+                self.abort("Label " + self.currentToken.text + " already declared")
+            self.labelsDeclared.add(self.currentToken.text)
+
             self.match(TokenType.INDENT)
 
         elif self.checkToken(TokenType.GOTO):
             print("STATEMENT_GOTO")
             self.nextToken()
+            self.labelsGotoed.add(self.currentToken.text)
             self.match(TokenType.INDENT)
 
         elif self.checkToken(TokenType.LET):
             print("STATEMENT_LET")
             self.nextToken()
+
+            if self.currentToken.text not in self.symbols:
+                self.symbols.add(self.currentToken.text)
             self.match(TokenType.INDENT)
             self.match(TokenType.EQ)
             self.expression()
@@ -84,6 +106,9 @@ class Parser():
         elif self.checkToken(TokenType.INPUT):
             print("STATEMENT_INPUT")
             self.nextToken()
+            if self.currentToken.text not in self.symbols:
+                self.symbols.add(self.currentToken.text)
+
             self.match(TokenType.INDENT)
         else:
             self.abort("Invalid Statement at "+ self.currentToken.text + "(" + self.currentToken.kind.name + ")")
@@ -142,9 +167,12 @@ class Parser():
         if self.checkToken(TokenType.NUMBER):
             self.nextToken()
         elif self.checkToken(TokenType.INDENT):
+
+            if self.currentToken.text not in self.symbols:
+                self.abort("Referenced variable before defined " + self.currentToken.text)
             self.nextToken()
         else:
             self.abort("Unexpected token at " + self.currentToken.text)
         
     def abort(self,message):
-        sys.exit("Error" + message)
+        sys.exit("Error - " + message)
