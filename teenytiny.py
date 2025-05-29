@@ -1,3 +1,4 @@
+from emitter import *
 from lex import * 
 from parse import *
 import sys
@@ -11,10 +12,12 @@ def main():
         source = inputFile.read()
 
     lexer = Lexer(source)
-    parser = Parser(lexer)
+    emitter = Emitter('out.c')
+    parser = Parser(lexer, emitter=emitter)
 
     parser.program()
-    print("Parsing Done")
+    emitter.WriteFile()
+    print("Compiling Done")
     
 
 main()
