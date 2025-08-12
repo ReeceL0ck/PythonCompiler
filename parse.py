@@ -80,12 +80,11 @@ class Parser():
             self.nextToken()
             self.emitter.emit("while (")
             self.condition()
-
+            
             self.match(TokenType.REPEAT)
             self.nl()
             self.emitter.emitLine(") {")
 
-            
             while not self.checkToken(TokenType.ENDWHILE):
                 self.statement()
 
@@ -150,16 +149,18 @@ class Parser():
     
     def condition(self):
         print("CONDITION")
-        self.emitter.emit(self.currentToken.text)
+        # self.emitter.emit(self.currentToken.text)
         self.expression()
 
         if self.isConditionOperator():
+            self.emitter.emit(self.currentToken.text)
             self.nextToken()
             self.expression()
         else:
             self.abort("Expected comparison at " + self.currentToken.text)
         
         while self.isConditionOperator():
+            self.emitter.emit(self.currentToken.text)
             self.nextToken()
             self.expression()
     

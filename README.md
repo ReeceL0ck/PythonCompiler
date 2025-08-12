@@ -9,7 +9,7 @@ To run the compiler all you need to do is python3 teenytiny.py filename.teeny
 
 
 # TODO 
-Finish WHILE conversion
+Finish WHILE conversion [ DONE ]
 Add () to statements
 Add types
 Add Arrays
